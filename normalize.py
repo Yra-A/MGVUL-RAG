@@ -222,14 +222,13 @@ def normalize_code_csv(data_path, store_path):
         rc_raw_code.append(rc) # 将处理后的代码添加到 rc_raw_code 中
 
     data["raw_code"] = rc_raw_code # raw code 是去除注释后的代码
-    data["normalize_code"] = normalize_code # normalize code 是去除注释后的代码，并且替换变量名为 VAR#，替换函数名为 FUN#，替换字符串为 STR
+    data["normalized_code"] = normalize_code # normalized code 是去除注释后的代码，并且替换变量名为 VAR#，替换函数名为 FUN#，替换字符串为 STR
     data.to_csv(store_path, index=False) # 将处理后的数据保存到 store_path
 
 
 def main():
     os.makedirs(constant.normalized_dir, exist_ok=True)
     normalize_code_csv(Path(constant.preprocessed_dir) / "bigvul_processed_metadata.csv", Path(constant.normalized_dir) / "bigvul_normalized.csv")
-
 
 if __name__ == "__main__":
     main()

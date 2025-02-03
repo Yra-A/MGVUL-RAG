@@ -40,8 +40,9 @@ test-results/       # 测试结果输出
 .env.development
 .env.production
 
-# 数据相关
+# 数据相关 / 中间文件
 *.csv
+*_code_files/
 
 # 个人代码
 Yra/
