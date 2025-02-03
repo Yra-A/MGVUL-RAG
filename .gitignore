@@ -44,4 +44,5 @@ test-results/       # 测试结果输出
 *.csv
 
 # 个人代码
-Yra.py
+Yra/
+Yra*.py
