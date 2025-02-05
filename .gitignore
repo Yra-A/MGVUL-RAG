@@ -39,11 +39,17 @@ test-results/       # 测试结果输出
 .env.local          # 本地环境变量
 .env.development
 .env.production
+.metals
+.scala-build
+.vscode
 
 # 数据相关 / 中间文件
 *.csv
 *_code_files/
+*_CPGs/
+*_graphs/
 
 # 个人代码
 Yra/
 Yra*.py
+test/
