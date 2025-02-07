@@ -68,10 +68,10 @@ def joern_parse(code_type: str):
 
 def main():
     # 将 normalized code 和 raw code 写入文件中
-    DF_to_code_file("normalized")
+    # DF_to_code_file("normalized")
     DF_to_code_file("raw")
-    joern_parse("normalized")
-    joern_parse("raw")
+    # joern_parse("normalized")
+    # joern_parse("raw")
 
 if __name__ == "__main__":
     main()

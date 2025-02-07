@@ -66,7 +66,6 @@ def process_bigvul(pre_num=0):
             "vul": int,
             "vul_func_with_fix": str,
         },
-        nrows=10,
     )
     df = df.rename(columns={"Unnamed: 0": "id", "func_before": "vulnerable_code", "func_after": "patched_code"})
     df["dataset"] = "bigvul"
@@ -77,8 +76,8 @@ def process_bigvul(pre_num=0):
     # 删除异常结尾的代码样本
     dfv = dfv[
         ~dfv.apply(
-            lambda x: x.func_before.strip()[-1] != "}"
-            and x.func_before.strip()[-1] != ";",
+            lambda x: x.vulnerable_code.strip()[-1] != "}"
+            and x.vulnerable_code.strip()[-1] != ";",
             axis=1,
         )
     ]
@@ -88,6 +87,7 @@ def process_bigvul(pre_num=0):
     df = df[(df.vul == 0) | (df["id"].isin(keep_vuln))].copy() # 保留 no-vul 样本和被预处理过的 vul 样本
 
     if pre_num > 0:
+        print(f"只加载前 {pre_num} 个样本!!!!!!")
         df = df.head(pre_num)
 
 
@@ -108,4 +108,4 @@ def process_bigvul(pre_num=0):
     
 # main 函数
 if __name__ == "__main__":
-    process_bigvul(10)
+    process_bigvul()

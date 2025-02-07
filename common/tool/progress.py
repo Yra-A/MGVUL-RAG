@@ -9,4 +9,5 @@ def print_progress(idx, total, print_step=None):
     # 如果当前任务编号 idx 刚好是步长的倍数，或者已经处理完成，则打印进度
     if idx % print_step == 0 or idx == total:
         progress = idx / total * 100
-        print("Process progress: {:.2f}%".format(progress))
+        print('\r', end='')
+        print("Process progress: {:.2f}%".format(progress),end='')

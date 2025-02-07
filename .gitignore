@@ -42,6 +42,7 @@ test-results/       # 测试结果输出
 .metals
 .scala-build
 .vscode
+__pycache__
 
 # 数据相关 / 中间文件
 *.csv

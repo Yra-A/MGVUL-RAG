@@ -4,8 +4,7 @@ import os
 import pandas as pd
 from pathlib import Path
 import common.constant as constant
-
-
+from common.tool.progress import print_progress
 
 # Clean Gadget
 # Author https://github.com/johnb110/VDPython:
@@ -142,9 +141,10 @@ def normalize_code(data_path, store_path):
     if not os.path.exists(store_path): # 如果 store_path 不存在，创建 store_path
         os.mkdir(store_path) # 创建 store_path
     for file in files:
+        # 打印进度
         count = count + 1 
-        print("\r", end="") # 将光标移动到行首，\r 是回车符
-        print("Process progress: {}%: ".format(count / files_num * 100), end="") # 打印进度 xx%
+        print_progress(count, files_num) 
+
         path = data_path + '/' + file # 文件路径
         with open(path, "r") as f1: # 打开文件
             code = f1.read() # 读取文件内容
