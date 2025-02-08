@@ -13,5 +13,11 @@ joern_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RA
 # joern 脚本路径
 all_script = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/joern-cli/graph/all.sc'
 
-# bpe_tokenizer 路径
-bpe_tokenizer_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/code_embedding/tokenizer.json'
+# embedding 文件夹
+embeddings_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/embeddings'
+
+# sent2vec model 文件夹
+represent_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/code_embedding/represent'
+
+# functions_graph 文件夹, 保存 normalized 和 raw 的所有函数图级表示
+functions_graph_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/functions_graph'
