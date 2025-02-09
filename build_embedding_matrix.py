@@ -3,7 +3,7 @@ import sent2vec
 import jsonlines
 from common.tool.progress import print_progress
 from code_embedding.qwenCoder_tokenize import tokenizer
-from common.constant import constant
+import common.constant as constant
 from pathlib import Path
 
 # process graph further
@@ -326,19 +326,19 @@ def get_sub_graph(new_line_nodes, new_line_edges, line_num, ast_nodes, ast_start
     return sub_graph_nodes, sub_graph_edges
 
 # 返回 max_length 个 padding 后的图
-def padding_graph(line_list, max_length):
-    if len(line_list) == max_length:
-        return line_list
-    if len(line_list) < max_length:
+def padding_graph(line_embeddings_list, max_length):
+    if len(line_embeddings_list) == max_length:
+        return line_embeddings_list
+    if len(line_embeddings_list) < max_length:
         blank_nodes_content = [[0 for _ in range(100)]] # 内容填 100 个 0
         blank_nodes_edge = []
         blank_line_dict = {"node_features": blank_nodes_content, "edges": blank_nodes_edge}
-        num_added_line = max_length - len(line_list)
+        num_added_line = max_length - len(line_embeddings_list)
         for i in range(num_added_line):
-            line_list.append(blank_line_dict)
-        return line_list
+            line_embeddings_list.append(blank_line_dict)
+        return line_embeddings_list
     else:
-        return line_list[:max_length]
+        return line_embeddings_list[:max_length]
 
 # 获取 fold 下 code_type 的所有 mid_graph 的图表示，每个函数的图表示保存在一个 jsonl 文件中
 def get_fun_graph(fold, code_type):
@@ -347,12 +347,14 @@ def get_fun_graph(fold, code_type):
     sent2vec_model = sent2vec.Sent2vecModel()
     sent2vec_model.load_model(constant.represent_dir + "/"+code_type+"_model.bin")
 
-    idx = 0
-    
     for root, _, files in os.walk(fold):
         files_num = len(files)
         count = 0
+        print("total files: ", files_num)
         
+        # 按文件名 id.后缀 的 id 排序
+        files = sorted(files, key=lambda x: int(x.split(".")[0]))
+
         # 遍历所有函数，得到每个函数的图表示
         for fname in files:
             count += 1
@@ -361,6 +363,8 @@ def get_fun_graph(fold, code_type):
             if not fname.endswith(".txt"):
                 continue
             
+            id = fname.split(".")[0]
+
             file_path = os.path.join(root, fname)
             
             # 提取函数图信息
@@ -388,24 +392,22 @@ def get_fun_graph(fold, code_type):
                 for node in sub_graph_nodes:
                     content_tokenized = tokenizer.tokenize(node["content"])
                     # to know
-                    vector = sent2vec_model.embed_sentence(" ".join(content_tokenized))[0]
-                    print(vector, type(vector))
-
-                    node_features.append(vector.tolist())
+                    vector = sent2vec_model.embed_sentence(" ".join(content_tokenized))[0] # [0] 返回句子列表中的第一个句子的 embedding
+                    node_features.append(vector.tolist()) # 将 numpy.ndarray 转成 list
 
                 line_graph = {"node_features": node_features, "edges": sub_graph_edges} # 得到该行的图 embedding
                 line_embeddings_list.append(line_graph)
             
             # padding 并追加保存当前函数的图集表示到 jsonl 文件
-            if len(line_list) > 0:
-                line_list = padding_graph(line_embeddings_list, 128)
+            if len(line_embeddings_list) > 0:
+                line_embeddings_list = padding_graph(line_embeddings_list, 128)
                 save_path = constant.functions_graph_dir + "/" + code_type + "_function_embedding.jsonl"
+                os.makedirs(os.path.dirname(save_path), exist_ok=True)
                 with jsonlines.open(save_path, mode='a') as writer:
-                    writer.write({"function_idx": idx, "label": label, "graph": line_list})
-                    idx += 1
+                    writer.write({"function_id": id, "label": label, f"{code_type}_graph": line_embeddings_list})
     
     # 保存问题文件
-    print("{} problem_files: ".format(code_type))
+    print("\n{} problem_files: ".format(code_type))
     print(len(problem_files))
     problem_file_path = constant.functions_graph_dir + "/problem/" + code_type + "_problem_files.txt"
     os.makedirs(os.path.dirname(problem_file_path), exist_ok=True) 
@@ -413,6 +415,11 @@ def get_fun_graph(fold, code_type):
         pf.writelines(problem_files)
 
 def main(code_type):
-    fold = Path(constant.normalized_dir) / f"{code_type}_graphs"
+    fold = Path(constant.normalized_dir) / f"{code_type}_mid_graphs"
+    print("Start to get {} function graph".format(code_type))
     os.makedirs(fold, exist_ok=True)
     get_fun_graph(fold, code_type)
+
+if __name__ == '__main__':
+    # main("normalized")
+    main("raw")

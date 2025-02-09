@@ -49,6 +49,10 @@ __pycache__
 *_code_files/
 *_CPGs/
 *_graphs/
+*_model.bin
+functions_graph/
+sent2vec/
+sent2vec_train/
 
 # 个人代码
 Yra/

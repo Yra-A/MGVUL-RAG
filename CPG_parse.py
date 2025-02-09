@@ -33,30 +33,40 @@ def DF_to_code_file(code_type: str):
 
 # 将 normalized_code 和 raw_code 转换为 CPG 保存在 normalized_CPGs 和 raw_CPGs 中
 def joern_parse(code_type: str): 
+    print("开始转换 {}_codes 到 CPGs".format(code_type))
     codes_path = normalized_codes_path
     if code_type == "raw":
         codes_path = raw_codes_path
 
     out_dir = Path(constant.normalized_dir) / f"{code_type}_CPGs"
     os.makedirs(out_dir, exist_ok=True)
+    joern_path = constant.joern_path
+    os.chdir(joern_path)
 
-    cur_progress = 0
+    # 根据已经存在的 output 得到需要处理的文件
+    file_list = os.listdir(codes_path)
+    total = len(file_list)
+    processed_list = os.listdir(out_dir)
+    for file in processed_list:
+        name = file.split("_")[0] + ".c"
+        if name in file_list:
+            file_list.remove(name)
+    
+    print("已生成的 CPGs 个数: ", len(processed_list))
+    print("待生成的 CPGs 个数: ", len(file_list))
 
-    print("开始转换 {}_codes 到 CPGs".format(code_type))
+    cur_progress = len(processed_list)
 
-    for file in os.listdir(codes_path):
+    for file in file_list:
+        name, _ = os.path.splitext(file) # 得到 id
+        output = str(out_dir / f"{name}_cpg.bin")
+
         # 打印进度
         cur_progress += 1
-        print_progress(cur_progress, len(os.listdir(codes_path)))
+        print_progress(cur_progress, total, 1)
 
-        name, _ = os.path.splitext(file) # 得到 id
-        out_dir = Path(constant.normalized_dir) / f"{code_type}_CPGs" # CPG 的文件夹
-        os.makedirs(out_dir, exist_ok=True)
-
-        joern_path = constant.joern_path
-        os.chdir(joern_path)
         os.environ['input'] = str(codes_path / file)
-        os.environ['output'] = str(out_dir / f"{name}_cpg.bin")
+        os.environ['output'] = output
 
         process = subprocess.Popen('sh joern-parse $input --out $output',    
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -69,8 +79,8 @@ def joern_parse(code_type: str):
 def main():
     # 将 normalized code 和 raw code 写入文件中
     # DF_to_code_file("normalized")
-    DF_to_code_file("raw")
-    # joern_parse("normalized")
+    # DF_to_code_file("raw")
+    joern_parse("normalized")
     # joern_parse("raw")
 
 if __name__ == "__main__":

@@ -34,13 +34,13 @@ def extract_graph_from_CPG(code_type: str):
                                        shell=True, close_fds=True)
             output = process.communicate()
             print(output)
-            name = str(input_path).split('/')[-1].split('.')[0] # 得到文件名，先按 / 分割，取最后一个元素，再按 . 分割，取第一个元素，例如 0_cpg.bin 得到 0_cpg
-    try:
-        shutil.rmtree(work_dir)
-    except Exception as e:
-        print(e)
-        print("remove error")
-        return
+            # name = str(input_path).split('/')[-1].split('.')[0] # 得到文件名，先按 / 分割，取最后一个元素，再按 . 分割，取第一个元素，例如 0_cpg.bin 得到 0_cpg
+    # try:
+    #     shutil.rmtree(work_dir)
+    # except Exception as e:
+    #     print(e)
+    #     print("remove error")
+    #     return
             
 def main():
     extract_graph_from_CPG("normalized")
