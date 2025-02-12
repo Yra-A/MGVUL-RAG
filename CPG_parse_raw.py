@@ -87,9 +87,7 @@ def worker_function(name, file_list, codes_path, out_dir):
 if __name__ == "__main__":
     print(f"主进程 (PID: {os.getpid()}) 开始执行")
     code_type = "raw"
-    codes_path = raw_codes_path
-    if code_type == "normalized":
-        codes_path = normalized_codes_path
+    codes_path = Path(constant.normalized_dir) / f"{code_type}_code_files"
     
     file_list = os.listdir(codes_path) 
     
@@ -102,7 +100,7 @@ if __name__ == "__main__":
             file_list.remove(name)
 
 
-    process_num = 5
+    process_num = 3
     print("剩余未处理的文件个数: ", len(file_list))
     print("开始处理剩余文件, 子进程数: {}".format(process_num))
     

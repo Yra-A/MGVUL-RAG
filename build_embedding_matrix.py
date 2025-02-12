@@ -340,7 +340,7 @@ def padding_graph(line_embeddings_list, max_length):
     else:
         return line_embeddings_list[:max_length]
 
-# 获取 fold 下 code_type 的所有 mid_graph 的图表示，每个函数的图表示保存在一个 jsonl 文件中
+# 获取 fold 下 code_type 的所有 mid_graph 的图 embedding，每个函数的图 embedding 保存在一个 jsonl 文件中
 def get_fun_graph(fold, code_type):
     problem_files = []
 
@@ -355,7 +355,7 @@ def get_fun_graph(fold, code_type):
         # 按文件名 id.后缀 的 id 排序
         files = sorted(files, key=lambda x: int(x.split(".")[0]))
 
-        # 遍历所有函数，得到每个函数的图表示
+        # 遍历所有函数，得到每个函数的图 embedding
         for fname in files:
             count += 1
             print_progress(count, files_num)
@@ -414,12 +414,12 @@ def get_fun_graph(fold, code_type):
     with open(problem_file_path, 'w', encoding='utf-8') as pf:
         pf.writelines(problem_files)
 
-def main(code_type):
-    fold = Path(constant.normalized_dir) / f"{code_type}_mid_graphs"
-    print("Start to get {} function graph".format(code_type))
-    os.makedirs(fold, exist_ok=True)
-    get_fun_graph(fold, code_type)
+# def main(code_type): # TODO {code_type}_graph 包含三个信息，并 update padding_graph
+#     fold = Path(constant.normalized_dir) / f"{code_type}_mid_graphs"
+#     print("Start to get {} function graph".format(code_type))
+#     os.makedirs(fold, exist_ok=True)
+#     get_fun_graph(fold, code_type)
 
-if __name__ == '__main__':
-    # main("normalized")
-    main("raw")
+# if __name__ == '__main__':
+#     # main("normalized")
+#     main("raw")

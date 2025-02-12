@@ -24,3 +24,6 @@ represent_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL
 
 # functions_graph 文件夹, 保存 normalized 和 raw 的所有函数图级表示
 functions_graph_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/functions_graph'
+
+# 保存问题函数日志的路径
+problem_log_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/logs/problem_fun.txt'
