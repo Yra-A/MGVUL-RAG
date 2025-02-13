@@ -59,7 +59,10 @@ def joern_parse(code_type: str):
                 print("{} 进度: {}/{}".format(dir, count, len(os.listdir(dir_path))))
                 
                 name = file.split(".")[0]
-                out_dir = constant.vul_rag_normalized + f"{code_type}_CPGs" + f"/{dir}"
+                if os.path.exists(Path(constant.vul_rag_normalized) / f"{code_type}_CPGs" / dir / f"{name}_cpg.bin"):
+                    continue
+
+                out_dir = constant.vul_rag_normalized + f"/{code_type}_CPGs" + f"/{dir}"
                 os.makedirs(out_dir, exist_ok=True)
                 joern_path = constant.joern_path
                 os.chdir(joern_path)
