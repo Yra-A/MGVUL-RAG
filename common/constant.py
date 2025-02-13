@@ -27,3 +27,15 @@ functions_graph_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection
 
 # 保存问题函数日志的路径
 problem_log_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/logs/problem_fun.txt'
+
+# vul-rag dir
+vul_rag_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag'
+
+# vul-rag vunerability knowledge 数据
+vul_rag_vul_knowledge_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge'
+
+# vul-rag vunerability knowledge with id 数据
+vul_rag_vul_knowledge_with_id_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge_with_id'
+
+# vul-rag normalized dir
+vul_rag_normalized = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/normalized'

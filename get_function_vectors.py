@@ -144,25 +144,6 @@ class GATEncoder(nn.Module):
         x = global_mean_pool(x, batch)
         return x
 
-def compute_graph_features(graph_list, pooling_type='mean'):
-    """
-    graph_list: 包含多个图字典的列表
-    pooling_type: 'mean' 或 'max'，选择哪种全局 pooling 的结果
-    返回：一个 [num_graph, out_dim] 的 tensor，每个图对应一个特征向量
-    """
-    batch = Batch.from_data_list(data_list)
-    
-    # 前向传播得到每个图的 pooled 表示
-    with torch.no_grad():
-        pooled_mean, pooled_max = gat_model(batch.x, batch.edge_index, batch.batch)
-    
-    if pooling_type == 'mean':
-        return pooled_mean  # [num_graph, out_dim]
-    elif pooling_type == 'max':
-        return pooled_max
-    else:
-        raise ValueError("pooling_type 必须为 'mean' 或 'max'")
-
 # 获取函数的 三个 特征向量：sequence, raw_graph vector, normalized_graph vector
 def get_func_all_embeddings(function_path):
     sequence_list, raw_graph_list = get_vector_raw_and_sequence_by_mid_graph(function_path)
@@ -208,3 +189,5 @@ def get_func_all_embeddings(function_path):
     normalized_vec256_max = torch.max(normalized_pooled_mean_256, dim=0)
 
     sequence_vec = torch.mean(torch.tensor(sequence_list), dim=0)
+
+    return sequence_vec, raw_vec128_mean, raw_vec256_mean, normalized_vec128_mean, normalized_vec256_mean, raw_vec128_max, raw_vec256_max, normalized_vec128_max, normalized_vec256_max

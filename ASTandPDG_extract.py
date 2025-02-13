@@ -11,30 +11,45 @@ def extract_graph_from_CPG(code_type: str):
     script_file = constant.all_script
 
     work_dir = Path(constant.normalized_dir) / f"{code_type}_CPGs"
-    out_dir = Path(constant.normalized_dir) / f"{code_type}_graphs"
+    problem_file = Path(constant.problem_log_path) / f"{code_type}_problem_graph_info_extract.txt"
 
     print("开始转换 {}_CPGs 到 graphs".format(code_type))
-    
-    if out_dir.exists():
+
+    total = len(os.listdir(work_dir))
+
+
+    for i in range(total):
+        input_path = Path(work_dir) / f"{i}_cpg.bin"
+        if not input_path.exists():
+            with open(problem_file, "a") as f:
+                f.write(f"{i}_cpg.bin not exists\n")
+            continue
+        os.chdir(joern_path)
+        print("current input file:", input_path)
+
+        out_dir = Path(constant.normalized_dir) / f"{code_type}_graphs" / f"temp_{i}"
+        os.makedirs(out_dir, exist_ok=True)
+        
+        # 设置参数
+        params = f"cpgFile={input_path},outDir={out_dir}"
+        os.environ['params'] = str(params)
+        os.environ['script_file'] = str(script_file)
+
+        process = subprocess.Popen('sh joern --script $script_file --params $params',    
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    shell=True, close_fds=True)
+        output = process.communicate()
+        print(output)
+
+        # 筛选
+        for root, dirs, files in os.walk(out_dir):
+            for file in files:
+                with open(Path(root) / file, 'r', encoding='utf-8') as f:  # 打开文件
+                    lines = str(f.read())  # 读取文件内容
+                if lines.startswith("(Some(/Users"):
+                    print("current file:", file)
+                    shutil.move(Path(out_dir) / file, Path(constant.normalized_dir) / f"{code_type}_graphs" / f"{i}_graph_info.txt")
         shutil.rmtree(out_dir)
-    count = 0
-    for root, dirs, files in os.walk(work_dir):
-        for file in files:
-            if not file.endswith("_cpg.bin"):
-                continue
-            count += 1
-            print_progress(count, len(files))
-            input_path = Path(root) / file
-            os.chdir(joern_path)
-            params = f"cpgFile={input_path},outDir={out_dir}"
-            os.environ['params'] = str(params)
-            os.environ['script_file'] = str(script_file)
-            process = subprocess.Popen('sh joern --script $script_file --params $params',    
-                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                       shell=True, close_fds=True)
-            output = process.communicate()
-            print(output)
-            # name = str(input_path).split('/')[-1].split('.')[0] # 得到文件名，先按 / 分割，取最后一个元素，再按 . 分割，取第一个元素，例如 0_cpg.bin 得到 0_cpg
     # try:
     #     shutil.rmtree(work_dir)
     # except Exception as e:
@@ -44,7 +59,7 @@ def extract_graph_from_CPG(code_type: str):
             
 def main():
     extract_graph_from_CPG("normalized")
-    extract_graph_from_CPG("raw")
+    # extract_graph_from_CPG("raw")
 
 if __name__ == "__main__":
     main()
