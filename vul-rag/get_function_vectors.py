@@ -10,13 +10,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import Data, Batch
 from torch_geometric.nn import GATConv, global_mean_pool, global_max_pool
+import json
 
 # 从 C 函数提取的 mid_graph 中获取 raw graph 和 sequence 类型特征向量
-def get_vector_raw_and_sequence_by_mid_graph(function_path):
-    # 保证函数为 .c，报错
-    if function_path[-2:] != ".c":
-        raise Exception("The file is not a C file!")
-    
+def get_vector_raw_and_sequence_by_mid_graph(graph_path):
     sent2vec_model = sent2vec.Sent2vecModel()
     sent2vec_model.load_model(constant.represent_dir + "/raw_model.bin")
 
@@ -24,13 +21,13 @@ def get_vector_raw_and_sequence_by_mid_graph(function_path):
     source_code, adj_ast, adj_cfg, \
     adj_pdg, ast_nodes, cfg_nodes, pdg_nodes, \
     pdg_start_nodes, pdg_dest_nodes, ast_start_nodes, \
-    ast_dest_nodes, problem = bem.extract_graph_info(function_path)
+    ast_dest_nodes, problem = bem.extract_graph_info(graph_path)
 
     if problem:
         # 写个问题日志
         with open(constant.problem_log_path, "a") as f:
-            f.write("提取 Mid Graph Information 时出错, function_path:"function_path + "\n")
-        print("存在问题文件：", function_path)
+            f.write(f"提取 Mid Graph Information 时出错, graph_path:{graph_path}\n")
+        print("存在问题文件：", graph_path)
         return None
     
     # 获取函数 PDG，并按行号排序
@@ -65,10 +62,9 @@ def get_vector_raw_and_sequence_by_mid_graph(function_path):
     return sequence_list, raw_graph_list
     
 # 从 C 函数提取的 mid_graph 中获取 normalized graph 类型特征向量
-def get_vector_normalized_by_mid_graph(function_path):
-    # 保证函数为 .c，报错
-    if function_path[-2:] != ".c":
-        raise Exception("The file is not a C file!")
+def get_vector_normalized_by_mid_graph(graph_path):
+    if not str(graph_path).endswith("mid_graph.txt"):
+        raise Exception("The file is not a mid graph.")
     
     sent2vec_model = sent2vec.Sent2vecModel()
     sent2vec_model.load_model(constant.represent_dir + "/normalized_model.bin")
@@ -77,13 +73,13 @@ def get_vector_normalized_by_mid_graph(function_path):
     source_code, adj_ast, adj_cfg, \
     adj_pdg, ast_nodes, cfg_nodes, pdg_nodes, \
     pdg_start_nodes, pdg_dest_nodes, ast_start_nodes, \
-    ast_dest_nodes, problem = bem.extract_graph_info(function_path)
+    ast_dest_nodes, problem = bem.extract_graph_info(graph_path)
 
     if problem:
         # 写个问题日志
         with open(constant.problem_log_path, "a") as f:
-            f.write("提取 Mid Graph Information 时出错, function_path:"function_path + "\n")
-        print("存在问题文件：", function_path)
+            f.write(f"提取 Mid Graph Information 时出错, graph_path:{graph_path}\n")
+        print("存在问题文件：", graph_path)
         return None
     
     # 获取函数 PDG，并按行号排序
@@ -110,20 +106,13 @@ def get_vector_normalized_by_mid_graph(function_path):
     return normalized_line_embeddings_list
 
 # 将图字典转换为 PyG 的 Data 对象
-def convert_graph_to_data(graph):
-    """
-    graph: dict，格式例如：
-      {
-          "raw_node_features": [[...], [...], ...],
-          "raw_edges": [[src1, dst1], [src2, dst2], ...]
-      }
-    """
+def convert_graph_to_data(graph, code_type):
     # 将节点特征转换为 tensor
-    x = torch.tensor(graph["raw_node_features"], dtype=torch.float)
+    x = torch.tensor(graph[f"{code_type}_node_features"], dtype=torch.float)
     
     # 假设 raw_edges 是列表，每个元素 [src, dst]
     # 转换为 tensor，并转置为 shape [2, num_edges]
-    edge_index = torch.tensor(graph["raw_edges"], dtype=torch.long).t().contiguous()
+    edge_index = torch.tensor(graph[f"{code_type}_edges"], dtype=torch.long).t().contiguous()
     
     data = Data(x=x, edge_index=edge_index)
     return data
@@ -144,20 +133,25 @@ class GATEncoder(nn.Module):
         return x
 
 # 获取函数的 三个 特征向量：sequence, raw_graph vector, normalized_graph vector
-def get_func_all_embeddings(function_path):
-    sequence_list, raw_graph_list = get_vector_raw_and_sequence_by_mid_graph(function_path)
-    normalized_graph_list = get_vector_normalized_by_mid_graph(function_path)
+def get_func_all_embeddings(fun_path):
+    fun_name = fun_path.split("/")[-1].split(".")[0]
+    CWE_ID = fun_path.split("/")[-2]
+    raw_graph_path = Path(constant.vul_rag_normalized) / "raw_mid_graphs" / CWE_ID / (fun_name + "_mid_graph.txt")
+    normalized_graph_path = Path(constant.vul_rag_normalized) / "normalized_mid_graphs" / CWE_ID / (fun_name + "_mid_graph.txt")
+    
+    sequence_list, raw_graph_list = get_vector_raw_and_sequence_by_mid_graph(raw_graph_path)
+    normalized_graph_list = get_vector_normalized_by_mid_graph(normalized_graph_path)
     
     raw_vector_list = []
     normalized_vector_list = []
 
     # 将 graph_list 转换为 PyG 的 Data 对象
     for graph in raw_graph_list:
-        raw_vector_list.append(convert_graph_to_data(graph))
+        raw_vector_list.append(convert_graph_to_data(graph, "raw"))
     batch_raw = Batch.from_data_list(raw_vector_list)
 
     for graph in normalized_graph_list:
-        normalized_vector_list.append(convert_graph_to_data(graph))
+        normalized_vector_list.append(convert_graph_to_data(graph, "normalized"))
     batch_normalized = Batch.from_data_list(normalized_vector_list)
 
     # 特征维度为 feature_dim
@@ -190,3 +184,62 @@ def get_func_all_embeddings(function_path):
     sequence_vec = torch.mean(torch.tensor(sequence_list), dim=0)
 
     return sequence_vec, raw_vec128_mean, raw_vec256_mean, normalized_vec128_mean, normalized_vec256_mean, raw_vec128_max, raw_vec256_max, normalized_vec128_max, normalized_vec256_max
+
+def main():
+    for dir in os.listdir(constant.vul_rag_normalized + "/normalized_code_files"):
+        print("开始转换文件夹: {}".format(dir))
+        if not dir.startswith("CWE-"):
+            continue
+        dir_path = constant.vul_rag_normalized + "/normalized_code_files" + "/" + dir
+        if os.path.isdir(dir_path):
+            count = 0
+            CWE_ID = dir
+            json_path = constant.vul_rag_vul_knowledge_with_id_dir + "/" + f"gpt-3.5-turbo_{CWE_ID}_316_with_id.json"
+            with open(json_path, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            for CVE_ID, CVE_LIST in data.items():  
+                for item in CVE_LIST:    
+                    id = item["id"]
+                    count += 1
+                    print("{} 进度: {}/{}".format(dir, count, len(os.listdir(dir_path))))
+                    
+                    fun_path = dir_path + "/" + str(id) + "_before.c"
+                    sequence_vec, raw_vec128_mean, raw_vec256_mean,\
+                    normalized_vec128_mean, normalized_vec256_mean,\
+                    raw_vec128_max, raw_vec256_max, normalized_vec128_max,\
+                    normalized_vec256_max = get_func_all_embeddings(fun_path)
+
+                    item["before_sequence_vec"] = sequence_vec.tolist()
+                    item["before_raw_vec128_mean"] = raw_vec128_mean.tolist()
+                    item["before_raw_vec256_mean"] = raw_vec256_mean.tolist()
+                    item["before_normalized_vec128_mean"] = normalized_vec128_mean.tolist()
+                    item["before_normalized_vec256_mean"] = normalized_vec256_mean.tolist()
+                    item["before_raw_vec128_max"] = raw_vec128_max.values.tolist()
+                    item["before_raw_vec256_max"] = raw_vec256_max.values.tolist()
+                    item["before_normalized_vec128_max"] = normalized_vec128_max.values.tolist()
+                    item["before_normalized_vec256_max"] = normalized_vec256_max.values.tolist()
+
+                    fun_path = dir_path + "/" + str(id) + "_after.c"
+                    sequence_vec, raw_vec128_mean, raw_vec256_mean,\
+                    normalized_vec128_mean, normalized_vec256_mean,\
+                    raw_vec128_max, raw_vec256_max, normalized_vec128_max,\
+                    normalized_vec256_max = get_func_all_embeddings(fun_path)
+
+                    item["after_sequence_vec"] = sequence_vec.tolist()
+                    item["after_raw_vec128_mean"] = raw_vec128_mean.tolist()
+                    item["after_raw_vec256_mean"] = raw_vec256_mean.tolist()
+                    item["after_normalized_vec128_mean"] = normalized_vec128_mean.tolist()
+                    item["after_normalized_vec256_mean"] = normalized_vec256_mean.tolist()
+                    item["after_raw_vec128_max"] = raw_vec128_max.values.tolist()
+                    item["after_raw_vec256_max"] = raw_vec256_max.values.tolist()
+                    item["after_normalized_vec128_max"] = normalized_vec128_max.values.tolist()
+                    item["after_normalized_vec256_max"] = normalized_vec256_max.values.tolist()
+                    
+                    os.makedirs(constant.vulnerability_knowledge_with_vectors_dir, exist_ok=True)
+                    save_path = Path(constant.vulnerability_knowledge_with_vectors_dir) / f"{CWE_ID}_with_vectors.json"
+                    with open(save_path, 'w', encoding='utf-8') as nfile:
+                        json.dump(data, nfile, indent=2)
+    
+if __name__ == "__main__":
+    main()
+    

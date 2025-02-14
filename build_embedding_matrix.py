@@ -40,13 +40,6 @@ def extract_graph_info(file_path):
         for line in data:
             
             # 当前在读什么，按顺序一个一个读
-            if line.find("-----Label-----") >= 0:
-                label_label = True
-                continue
-            if label_label:
-                label = line.replace('\n', "") # 将这行的换行符去掉，并把这行的内容赋值给 label
-                label_label = False
-
             if line.find("-----Code-----") >= 0:
                 label_code = True
                 continue
@@ -134,7 +127,7 @@ def extract_graph_info(file_path):
                         pdg_nodes.append(error_node)
                     continue
 
-    return label, source_code, adj_ast, adj_cfg, adj_pdg, \
+    return source_code, adj_ast, adj_cfg, adj_pdg, \
            ast_nodes, cfg_nodes, pdg_nodes, pdg_start_nodes, pdg_dest_nodes, \
            ast_start_nodes, ast_dest_nodes, problem
 
@@ -368,7 +361,7 @@ def get_fun_graph(fold, code_type):
             file_path = os.path.join(root, fname)
             
             # 提取函数图信息
-            label, source_code, adj_ast, adj_cfg, \
+            source_code, adj_ast, adj_cfg, \
             adj_pdg, ast_nodes, cfg_nodes, pdg_nodes, \
             pdg_start_nodes, pdg_dest_nodes, ast_start_nodes, \
             ast_dest_nodes, problem = extract_graph_info(file_path)

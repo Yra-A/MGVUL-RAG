@@ -39,3 +39,6 @@ vul_rag_vul_knowledge_with_id_dir = '/Users/yra/Yra/graduation_project/vulnerabi
 
 # vul-rag normalized dir
 vul_rag_normalized = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/normalized'
+
+# vulnerability knowledge with vectors
+vulnerability_knowledge_with_vectors_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge_with_vectors'

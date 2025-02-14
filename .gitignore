@@ -53,6 +53,7 @@ __pycache__
 functions_graph/
 sent2vec/
 sent2vec_train/
+*_with_vectors.json
 
 # 个人代码
 Yra/

@@ -213,7 +213,7 @@ def joernGraph(code_type):
                         os.makedirs(output_path)
 
                     # 写入文件
-                    with open(output_path + "/" + filename + ".txt", 'w', encoding='utf-8') as f2:
+                    with open(output_path + "/" + filename + "_mid_graph.txt", 'w', encoding='utf-8') as f2:
                         f2.write("-----Label-----\n")
                         f2.write(dataTag + "\n")
                         f2.write("-----Code-----\n")

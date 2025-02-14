@@ -40,4 +40,4 @@ def to_train_file(code_type):
         print(f"Problem with: {problem}")
 
 to_train_file("normalized")
-to_train_file("raw")
+# to_train_file("raw")
