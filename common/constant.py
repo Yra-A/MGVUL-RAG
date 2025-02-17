@@ -51,8 +51,15 @@ vulnerability_knowledge_with_vectors_dir = '/Users/yra/Yra/graduation_project/vu
 
 # CWE-ID ENUM
 CWE_ID_ENUM = {
-    'CWE-119', 'CWE-362', 'CWE-416', 'CWE-476', 'CWE-787'
+    '119', '362', '416', '476', '787'
 }
 
 # vul-rag test set
 vul_rag_test_set = "/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset"
+
+# vul-rag db uri
+vul_rag_db_uri = "/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/vul-rag.db"
+
+# vul-rag db collection
+def vul_rag_collection_name(cwe_id):
+    return f"vul_code_CWE_{cwe_id}"

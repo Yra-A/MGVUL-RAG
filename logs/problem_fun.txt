@@ -1,1 +1,9 @@
 testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-119/312 解析失败
+testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-119/365 解析失败
+testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-119/366 解析失败
+graph 不存在:(PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1045/raw/mid_graph.txt'), PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1045/normalized/mid_graph.txt'))
+testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1045 解析失败
+graph 不存在:(PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1061/raw/mid_graph.txt'), PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1061/normalized/mid_graph.txt'))
+testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1061 解析失败
+graph 不存在:(PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1182/raw/mid_graph.txt'), PosixPath('/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1182/normalized/mid_graph.txt'))
+testset 的 /Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset/vectors/CWE-362/1182 解析失败
