@@ -38,6 +38,12 @@ def joernGraph(code_type):
         for file in os.listdir(input_dir + '/' + dir):
             if not file.endswith(".txt"):
                 continue
+            # 如果存在，就跳过
+            if os.path.exists(output_dir + '/' + dir + '/' + file[:-4] + "_mid_graph.txt"):
+                count += 1
+                print("进度: {} / {}".format(count, total))
+                continue
+
             count += 1
             print("进度: {} / {}".format(count, total))
 

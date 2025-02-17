@@ -54,8 +54,8 @@ functions_graph/
 sent2vec/
 sent2vec_train/
 *_with_vectors.json
+testset/
 
 # 个人代码
 Yra/
 Yra*.py
-test/

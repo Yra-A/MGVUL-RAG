@@ -10,6 +10,12 @@ normalized_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVU
 # 训练 sent2vec 语料的文件夹
 sent2vec_train_file = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/sent2vec_train'
 
+# sent2vec raw model
+sent2vec_raw_model = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/code_embedding/raw_model.bin'
+
+# sent2vec normalized model
+sent2vec_normalized_model = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/code_embedding/normalized_model.bin'
+
 # joern 路径
 joern_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/joern-cli'
 
@@ -42,3 +48,11 @@ vul_rag_normalized = '/Users/yra/Yra/graduation_project/vulnerability_detection/
 
 # vulnerability knowledge with vectors
 vulnerability_knowledge_with_vectors_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge_with_vectors'
+
+# CWE-ID ENUM
+CWE_ID_ENUM = {
+    'CWE-119', 'CWE-362', 'CWE-416', 'CWE-476', 'CWE-787'
+}
+
+# vul-rag test set
+vul_rag_test_set = "/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset"
