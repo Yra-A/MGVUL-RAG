@@ -34,32 +34,49 @@ functions_graph_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection
 # 保存问题函数日志的路径
 problem_log_path = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/logs/problem_fun.txt'
 
-# vul-rag dir
-vul_rag_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag'
+# vul_rag dir
+vul_rag_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul_rag'
 
-# vul-rag vunerability knowledge 数据
-vul_rag_vul_knowledge_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge'
+# vul_rag vunerability knowledge 数据
+vul_rag_vul_knowledge_dir = vul_rag_dir + '/vulnerability_knowledge'
 
-# vul-rag vunerability knowledge with id 数据
-vul_rag_vul_knowledge_with_id_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge_with_id'
+# vul_rag vunerability knowledge with id 数据
+vul_rag_vul_knowledge_with_id_dir = vul_rag_dir + '/vulnerability_knowledge_with_id'
 
-# vul-rag normalized dir
-vul_rag_normalized = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/normalized'
+# vul_rag normalized dir
+vul_rag_normalized = vul_rag_dir + '/normalized'
 
 # vulnerability knowledge with vectors
-vulnerability_knowledge_with_vectors_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/vulnerability_knowledge_with_vectors'
+vulnerability_knowledge_with_vectors_dir = vul_rag_dir + '/vulnerability_knowledge_with_vectors'
 
 # CWE-ID ENUM
 CWE_ID_ENUM = {
     '119', '362', '416', '476', '787'
 }
 
-# vul-rag test set
-vul_rag_test_set = "/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/testset"
+# vul_rag test set
+vul_rag_test_set = vul_rag_dir + "/test/testset"
 
-# vul-rag db uri
-vul_rag_db_uri = "/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/test/vul-rag.db"
+# vul_rag db uri
+vul_rag_db_uri = vul_rag_dir + "/test/vul_rag.db"
 
-# vul-rag db collection
-def vul_rag_collection_name(cwe_id):
-    return f"vul_code_CWE_{cwe_id}"
+# vul_rag db collection
+vul_rag_collection_name="vul_code_CWE_{CWE_ID}"
+
+# common dir
+common_dir = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/common'
+
+# vul_rag test result
+vul_rag_test_result = vul_rag_dir + '/test/result'
+
+# vul_rag test data(input)
+vul_rag_test_data = vul_rag_test_set + '/CWE-{CWE_ID}_testset.json'
+vul_rag_test_data_vector = vul_rag_test_set + '/vectors/CWE-{CWE_ID}/{id}/func_vectors.json'
+
+# vul_rag vul knowledge with id file
+vul_knowledge_file = vul_rag_vul_knowledge_with_id_dir + '/gpt-3.5-turbo_CWE-{CWE_ID}_316_with_id.json'
+
+# vul positive
+vul_positive = 'VUL_YES'
+# vul negative
+vul_negative = 'VUL_NO'

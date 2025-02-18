@@ -26,8 +26,8 @@ def nodeInformation(nodeList):
 
 # 主函数，用于处理 joern_parse 生成的图数据
 def joernGraph(code_type):
-    input_dir = f"/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/normalized/{code_type}_graphs"
-    output_dir = f"/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul-rag/normalized/{code_type}_mid_graphs"
+    input_dir = f"/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul_rag/normalized/{code_type}_graphs"
+    output_dir = f"/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/vul_rag/normalized/{code_type}_mid_graphs"
 
     for dir in os.listdir(input_dir):  
         if not dir.startswith("CWE-"):

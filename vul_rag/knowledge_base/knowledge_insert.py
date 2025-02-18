@@ -74,9 +74,10 @@ def insert_data_from_pickle(db_uri):
                         item[key] = [0] * 256
             data.append(item)
         res = client.insert(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             data=data
         )
+        print(constant.vul_rag_collection_name.format(CWE_ID=CWE_ID))
         print(res)
 
 if __name__ == '__main__':

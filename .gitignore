@@ -57,6 +57,7 @@ sent2vec_train/
 testset/
 *.db
 *.pkl
+result/
 
 # 个人代码
 Yra/

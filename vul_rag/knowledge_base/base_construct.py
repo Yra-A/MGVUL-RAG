@@ -22,11 +22,11 @@ schema = CollectionSchema(fields=[id_field, sequence_vec, raw_vec128_mean, \
          auto_id=False, enable_dynamic_field=True, description="Vul Code Collection")
 
 for CWE_ID in constant.CWE_ID_ENUM:
-    if client.has_collection(collection_name=constant.vul_rag_collection_name(CWE_ID)):
-        client.drop_collection(collection_name=constant.vul_rag_collection_name(CWE_ID))
+    if client.has_collection(collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID)):
+        client.drop_collection(collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID))
 
     client.create_collection(
-        collection_name=constant.vul_rag_collection_name(CWE_ID), 
+        collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID), 
         schema=schema, 
     )
 
@@ -43,7 +43,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_sequence_vec,
             sync=False
         )
@@ -58,7 +58,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_raw_vec128_mean,
             sync=False
         )
@@ -73,7 +73,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_raw_vec256_mean,
             sync=False
         )
@@ -88,7 +88,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_normalized_vec128_mean,
             sync=False
         )
@@ -103,7 +103,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_normalized_vec256_mean,
             sync=False
         )
@@ -118,7 +118,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_raw_vec128_max,
             sync=False
         )
@@ -133,7 +133,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_raw_vec256_max,
             sync=False
         )
@@ -148,7 +148,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_normalized_vec128_max,
             sync=False
         )
@@ -163,7 +163,7 @@ def construct_index():
     )
     for CWE_ID in constant.CWE_ID_ENUM:
         client.create_index(
-            collection_name=constant.vul_rag_collection_name(CWE_ID),
+            collection_name=constant.vul_rag_collection_name.format(CWE_ID=CWE_ID),
             index_params=index_params_normalized_vec256_max,
             sync=False
         )
