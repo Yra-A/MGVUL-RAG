@@ -84,13 +84,17 @@ if __name__ == '__main__':
         if args.resume: # 从检查点恢复
             if os.path.exists(checkpoint_path): # 如果检查点文件存在
                 ckpt_cve_list = list(DataUtils.load_data_from_pickle_file(checkpoint_path)) # 从检查点文件中加载数据
+                print('----------------------------------------------------')
+                print('ckpt_cve_list: ', ckpt_cve_list)
+                print('----------------------------------------------------')
                 if os.path.exists(output_path): # 如果输出文件存在
                     data = DataUtils.load_json(output_path) # 加载输出文件
                     res_vul_list = data['vul_data'] # 获取 vul_data 检测结果
                     res_non_vul_list = data['non_vul_data'] # 获取non_vul_data 检测结果
-            else: 
+                    # print('output_path data:', data)
+            # else: 
                 # to avoid overwriting the existing output file
-                raise FileNotFoundError(f"Checkpoint file {checkpoint_path} not found.") # 抛出断点文件未找到异常
+            #     raise FileNotFoundError(f"Checkpoint file {checkpoint_path} not found.") # 抛出断点文件未找到异常
         
         # 开始检测
         try:
