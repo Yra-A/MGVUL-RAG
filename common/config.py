@@ -14,11 +14,27 @@ bailian_api_key = DataUtils.load_data_from_pickle_file(PathUtil.api_keys_data("b
 
 OPENAI_API_CONNECTION_PROXY = "http://127.0.0.1:58390"
 
-# ----------------------- config for Milvus -----------------------
-DETECT_TOP_N = 3 # 检索 TOP N 个结果
+DETECT_TOP_N = 3 # RAG 检索 TOP N 个结果
 
 RERANK_WEIGHT = { # 检索重排权重
     'sequence': 0.3,
     'normalized': 0.3,
     'raw': 0.4
 }
+
+RESULT_UNIFORM_MAP = {
+    1: 1,
+    0: 0,
+    -1: 0,
+    "yes": 1,
+    "no": 0,
+    "Yes": 1,
+    "No": 0,
+    "1": 1,
+    "0": 0,
+    "-1": 0,
+    "VUL_YES": 1,
+    "VUL_NO": 0
+}
+
+METRICS_DECIMAL_PLACES_RESERVED = 4

@@ -1,3 +1,5 @@
+from enum import Enum
+
 # bigvul 原始数据集路径
 bigvul_origin = '/Users/yra/Yra/graduation_project/vulnerability_detection/MGVUL-RAG/storage/original/MSR_data_cleaned.csv'
 
@@ -80,3 +82,26 @@ vul_knowledge_file = vul_rag_vul_knowledge_with_id_dir + '/gpt-3.5-turbo_CWE-{CW
 vul_positive = 'VUL_YES'
 # vul negative
 vul_negative = 'VUL_NO'
+
+class MetricsKeywords(Enum):
+    FN = "False Negative"
+    FP = "False Positive"
+    TP = "True Positive"
+    TN = "True Negative"
+    AC = "Accuracy"
+    PC = "Precision"
+    RC = "Recall"
+    F1 = "F1 Score"
+    PAC = "Pair Accuracy"
+    VPC = "Valid Pair Count"
+    APC = "Accurate Pair Count"
+    FNR = "False Negative Rate"
+    FPR = "False Positive Rate"
+    TNR = "True Negative Rate"
+    TPR = "True Positive Rate"
+    PD = "Prediction"
+    GT = "Ground Truth"
+    P1R = "Pair_1 Rate"
+    P0R = "Pair_0 Rate"
+    P1C = "Pair_1 Count"
+    P0C = "Pair_0 Count"

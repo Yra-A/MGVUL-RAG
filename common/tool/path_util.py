@@ -31,6 +31,8 @@ class PathUtil:
     
     @staticmethod
     def checkpoint_data(filename: str, ext: str):
+        # 横杠替换为下划线
+        filename = filename.replace("-", "_")
         path = Path(constant.vul_rag_test_result) / 'checkpoint'
         path.mkdir(parents = True, exist_ok = True)
         path = path / f'{filename}.{ext}'

@@ -45,7 +45,6 @@ if __name__ == '__main__':
     '''
 
     args = parse_command_line_arguments() # 解析命令行参数
-    result_dir_list = [] # 结果目录列表
 
     for CWE_ID in args.cwe_list:
         print(f"Start detecting {CWE_ID}...")
@@ -59,20 +58,20 @@ if __name__ == '__main__':
         )
 
         result_file_name = f"CWE_{CWE_ID}_{args.model_name}" # 结果文件名
+        result_file_name = result_file_name.replace("-", "_")
         checkpoint_path = PathUtil.checkpoint_data(result_file_name, "pkl") # 检查点路径
         output_path = PathUtil.vul_detection_output( # 最终结果文件 json
             filename=result_file_name,
             ext="json",
             detection_model_name=args.model_name,
+
         )
+        test_data_path = Path(constant.vul_rag_test_data.format(CWE_ID = CWE_ID)) # 测试数据路径
+        test_data = DataUtils.load_json(test_data_path) # 加载测试数据
         print("result_file_name: ", result_file_name)
         print("output_path: ", output_path)
         print("checkpoint_path: ", checkpoint_path)
-
-        result_dir_list.append(os.path.dirname(output_path)) # 结果目录列表
-
-        test_data_path = Path(constant.vul_rag_test_data.format(CWE_ID = CWE_ID)) # 测试数据路径
-        test_data = DataUtils.load_json(test_data_path) # 加载测试数据
+        print("test_data_path: ", test_data_path)
 
         vul_list = test_data['vul_data'] # 待检测的漏洞数据
         non_vul_list = test_data['non_vul_data'] # 待检测的非漏洞数据
@@ -80,6 +79,25 @@ if __name__ == '__main__':
 
         res_vul_list = [] # 检测结果的漏洞数据
         res_non_vul_list = [] # 检测结果的非漏洞数据
+
+        # if os.path.exists(checkpoint_path):
+        #     ckpt_cve_list = list(DataUtils.load_data_from_pickle_file(checkpoint_path))
+
+        # if os.path.exists(output_path):
+        #     data = DataUtils.load_json(output_path)
+        #     res_vul_list = data['vul_data']
+        #     res_non_vul_list = data['non_vul_data']
+        # for item in vul_list:
+        #     if item['id'] not in ckpt_cve_list:
+        #         ckpt_cve_list.append(item['id'])
+        
+        # for item in non_vul_list:
+        #     if item['id'] not in ckpt_cve_list:
+        #         ckpt_cve_list.append(item['id'])
+        # DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path)
+        # print('----------------------------------------------------')
+        # print('ckpt_cve_list: ', ckpt_cve_list)
+        # print('----------------------------------------------------')
         
         if args.resume: # 从检查点恢复
             if os.path.exists(checkpoint_path): # 如果检查点文件存在
@@ -91,48 +109,98 @@ if __name__ == '__main__':
                     data = DataUtils.load_json(output_path) # 加载输出文件
                     res_vul_list = data['vul_data'] # 获取 vul_data 检测结果
                     res_non_vul_list = data['non_vul_data'] # 获取non_vul_data 检测结果
-                    # print('output_path data:', data)
-            # else: 
+            else: 
                 # to avoid overwriting the existing output file
-            #     raise FileNotFoundError(f"Checkpoint file {checkpoint_path} not found.") # 抛出断点文件未找到异常
+                raise FileNotFoundError(f"Checkpoint file {checkpoint_path} not found.") # 抛出断点文件未找到异常
         
         # 开始检测
         try:
-            print(f"Start testing vulnerable samples")
-            for item in tqdm(vul_list):
-                if item['id'] in ckpt_cve_list:
-                    continue
+            print(f"------------------------- Start testing -------------------------")
+            len_vul_list = len(vul_list)
+            len_non_vul_list = len(non_vul_list)
+            i = 0
+            j = 0
+
+            vul_id_list = [item['id'] for item in vul_list]
+            non_vul_id_list = [item['id'] for item in non_vul_list]
+            print(f"vul_id_list: {vul_id_list}")
+            print(f"non_vul_id_list: {non_vul_id_list}")
+
+            while i < len_vul_list or j < len_non_vul_list:
+                if i < len_vul_list:
+                    item = vul_list[i]
+                    if item['id'] in ckpt_cve_list:
+                        i += 1
+                        continue
+                    vul_detect_result = VulD.detection_pipeline(
+                        test_id=item['id'],
+                        cve_id=item['cve_id'],
+                        cwe_id=CWE_ID,
+                        code_snippet=item['code_snippet'],
+                    )
+                    assert vul_detect_result['id'] == item['id']
+                    res_vul_list.append(vul_detect_result) # 添加检测结果
+                    ckpt_cve_list.append(item['id'])
+                    ckpt_cve_list = list(set(ckpt_cve_list))
+                    ckpt_cve_list.sort()
+                    i += 1
+                    DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
+                    DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
                 
-                vectors = constant.vul_rag_test_data_vector.format(CWE_ID = CWE_ID, id = item['id']) # 获取向量
-                vul_detect_result = VulD.detection_pipeline(
-                    id=item['id'],
-                    cve_id=item['cve_id'],
-                    cwe_id=CWE_ID,
-                    code_snippet=item['code_snippet'],
-                ) # 返回多了一个 detect_result 和 final_result 的 item
+                if j < len_non_vul_list:
+                    item = non_vul_list[j]
+                    if item['id'] in ckpt_cve_list:
+                        j += 1
+                        continue
+                    non_vul_detect_result = VulD.detection_pipeline(
+                        test_id=item['id'],
+                        cve_id=item['cve_id'],
+                        cwe_id=CWE_ID,
+                        code_snippet=item['code_snippet'],
+                    )
+                    assert non_vul_detect_result['id'] == item['id']
+                    res_non_vul_list.append(non_vul_detect_result)
+                    ckpt_cve_list.append(item['id'])
+                    ckpt_cve_list = list(set(ckpt_cve_list))
+                    ckpt_cve_list.sort()
+                    j += 1
+                    DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
+                    DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
 
-                res_vul_list.append(vul_detect_result) # 添加检测结果
-                ckpt_cve_list.append(item['id'])
-                DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
-                DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
+            # print(f"Start testing vulnerable samples")
+            # for item in tqdm(vul_list):
+            #     if item['id'] in ckpt_cve_list:
+            #         continue
+                
+            #     vul_detect_result = VulD.detection_pipeline(
+            #         test_id=item['id'],
+            #         cve_id=item['cve_id'],
+            #         cwe_id=CWE_ID,
+            #         code_snippet=item['code_snippet'],
+            #     ) # 返回多了一个 detect_result 和 final_result 的 item
 
-            print(f"Start testing non-vulnerable samples")
+            #     res_vul_list.append(vul_detect_result) # 添加检测结果
+            #     ckpt_cve_list.append(item['id'])
+            #     DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
+            #     DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
 
-            for item in tqdm(non_vul_list):
-                if item['id'] in ckpt_cve_list:
-                    continue
+            # print(f"Start testing non-vulnerable samples")
 
-                non_vul_detect_result = VulD.detection_pipeline(
-                    id=item['id'],
-                    cve_id=item['cve_id'],
-                    cwe_id=CWE_ID,
-                    code_snippet=item['code_snippet'],
-                )
+            # for item in tqdm(non_vul_list):
+            #     if item['id'] in ckpt_cve_list:
+            #         continue
 
-                res_non_vul_list.append(non_vul_detect_result) # 添加检测结果
-                ckpt_cve_list.append(item['id'])
-                DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
-                DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
+            #     non_vul_detect_result = VulD.detection_pipeline(
+            #         test_id=item['id'],
+            #         cve_id=item['cve_id'],
+            #         cwe_id=CWE_ID,
+            #         code_snippet=item['code_snippet'],
+            #     )
+
+            #     res_non_vul_list.append(non_vul_detect_result) # 添加检测结果
+            #     ckpt_cve_list.append(item['id'])
+            #     DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
+            #     DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
 
         except Exception as e:
             DataUtils.write_data_to_pickle_file(ckpt_cve_list, checkpoint_path) # 保存检查点
@@ -141,8 +209,8 @@ if __name__ == '__main__':
             print(f"Error: {e}")
             print(f"Detection for CWE_{CWE_ID} failed. Checkpoint saved.")
 
-        if os.path.exists(checkpoint_path): 
-            os.remove(checkpoint_path)
+        # if os.path.exists(checkpoint_path): 
+        #     os.remove(checkpoint_path)
         print(f"Detection for CWE_{CWE_ID} finished.")
         DataUtils.save_json(output_path, {"vul_data": res_vul_list, "non_vul_data": res_non_vul_list})
 

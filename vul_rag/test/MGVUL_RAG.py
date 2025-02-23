@@ -116,9 +116,9 @@ class MGVUL_RAG_Detector:
                 if item['id'] == id:
                     return item['vulnerability_behavior']
 
-    def detection_pipeline(self, id, cve_id, cwe_id, code_snippet):
+    def detection_pipeline(self, test_id, cve_id, cwe_id, code_snippet):
         detect_result = []
-        similar_code_list = self.retrieve_similar_code(id, cwe_id)
+        similar_code_list = self.retrieve_similar_code(test_id, cwe_id)
         print(f"similar_code_list: {similar_code_list}")
         count = 0
         assert(len(similar_code_list) > 0)
@@ -165,7 +165,7 @@ class MGVUL_RAG_Detector:
             # 有漏洞
             if constant.vul_positive in vul_output:
                 return {
-                    "id": id,
+                    "id": test_id,
                     "cve_id": cve_id,
                     "code_snippet": code_snippet, 
                     "detect_result": detect_result, 
@@ -177,7 +177,7 @@ class MGVUL_RAG_Detector:
         
         # 无漏洞
         return {
-            "id": id,
+            "id": test_id,
             "cve_id": cve_id, 
             "code_snippet": code_snippet, 
             "detect_result": detect_result, 
